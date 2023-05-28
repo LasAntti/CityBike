@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Raw Data ###
-!**/src/main/resources/datasets
+*.csv
