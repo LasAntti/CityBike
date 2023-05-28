@@ -12,7 +12,7 @@ public class databaseService {
         String jdbcurl = "jdbc:mysql://localhost:3306/citybike";
         String username = "root";
         String password = "";
-        String filepath = "src\\main\\resources\\datasets\\2021-05.csv";
+        String filepath = "server\\src\\main\\resources\\datasets\\Helsingin_ja_Espoon_kaupunkipyöräasemat_avoin.csv";
 
         int batchSize = 20;
 
@@ -22,7 +22,7 @@ public class databaseService {
             connection = DriverManager.getConnection(jdbcurl, username, password);
             connection.setAutoCommit(false);
 
-            String sql = "insert into travel_data (departure, arrival, departure_station_id, departure_station_name,arrival_station_id, arrival_station_name, distance_coveredin_meters,duration_in_seconds ) values(?,?,?,?,?,?,?,?)";
+            String sql = "insert into station_data (fid, id, nimi, namn, name, osoite, adress, kaupunki, stad, operator, capacity, lon, lat ) values(?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
             PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -34,24 +34,34 @@ public class databaseService {
             linReader.readLine();
             while ((lineText = linReader.readLine()) != null) {
                 String[] data = lineText.split(",");
-                String departure = data[0];
-                String arrival = data[1];
-                String departureStationID = data[2];
-                String departureStationName = data[3];
-                String arrivalStationID = data[4];
-                String arrivalStationName = data[5];
-                String distanceCoveredinMeters = data[6];
-                String durationInSeconds = data[7];
+                String fid = data[0];
+                String id = data[1];
+                String nimi = data[2];
+                String namn = data[3];
+                String name = data[4];
+                String osoite = data[5];
+                String adress = data[6];
+                String kaupunki = data[7];
+                String stad = data[8];
+                String operator = data[9];
+                String capacity = data[10];
+                String lon = data[11];
+                String lat = data[12];
+                
 
-                statement.setString(1, departure);
-                statement.setString(2, arrival);
-                statement.setObject(3, parseIntegerOrNull(departureStationID));
-                statement.setString(4, departureStationName);
-                statement.setObject(5, parseIntegerOrNull(arrivalStationID));
-                statement.setString(6, arrivalStationName);
-                statement.setObject(7, parseLongOrNull(distanceCoveredinMeters));
-                statement.setObject(8, parseLongOrNull(durationInSeconds));
-
+                statement.setObject(1, parseIntegerOrNull(fid));
+                statement.setObject(2, parseIntegerOrNull(id));
+                statement.setString(3, nimi);
+                statement.setString(4, namn);
+                statement.setString(5, name);
+                statement.setString(6, osoite);
+                statement.setString(7, adress);
+                statement.setString(8, kaupunki);
+                statement.setString(9, stad);
+                statement.setString(10, operator);
+                statement.setObject(11, parseIntegerOrNull(capacity));
+                statement.setObject(12, parseDoubleOrNull(lon));
+                statement.setObject(13, parseDoubleOrNull(lat));
                 statement.addBatch();
                 if (count % batchSize == 0) {
                     statement.executeBatch();
@@ -80,6 +90,14 @@ public class databaseService {
     private static Long parseLongOrNull(String value) {
         try {
             return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private static Double parseDoubleOrNull(String value) {
+        try {
+            return Double.parseDouble(value);
         } catch (NumberFormatException e) {
             return null;
         }
