@@ -4,17 +4,27 @@ import 'package:http/http.dart' as http;
 
 class Station {
   int id;
-  String name;
+  String nimi;
+  String? name;
+  String? namn;
   String address;
   double latitude;
   double longitude;
+  int capacity;
+  String kaupunki;
+  String stad;
 
   Station({
     required this.id,
-    required this.name,
+    required this.nimi,
+     this.name,
+     this.namn,
     required this.address,
     required this.latitude,
     required this.longitude,
+    required this.capacity,
+    required this.kaupunki,
+    required this.stad,
   });
 }
 
@@ -33,17 +43,18 @@ Future<List<Station>> getAllBikeStations() async {
         if (data['lat'] != null && data['lon'] != null) {
           Station station = Station(
             id: data['id'] as int,
-            name: data['nimi'] as String,
+            nimi: data['nimi'] as String,
+            name: data['name'] as String,
+            namn: data['namn'] as String,
             address: data['osoite'] as String,
             latitude: data['lat'] as double,
             longitude: data['lon'] as double,
+            capacity: data['capacity'] as int,
+            kaupunki: data['kaupunki'] as String,
+            stad: data['stad'] as String,
           );
           stations.add(station);
-          print('Station: ${station.name} added to list');
-          print('id: ${station.id}');
-          print('Address: ${station.address}');
-          print('Latitude: ${station.latitude}');
-          print('Longitude: ${station.longitude}');
+          
         }
       }
       return stations;
