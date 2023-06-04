@@ -17,8 +17,8 @@ class Station {
   Station({
     required this.id,
     required this.nimi,
-     this.name,
-     this.namn,
+    this.name,
+    this.namn,
     required this.address,
     required this.latitude,
     required this.longitude,
@@ -32,10 +32,15 @@ Future<List<Station>> getAllBikeStations() async {
   try {
     final url = Uri.parse('http://192.168.1.188:8080/allStationData');
 
-    final response = await http.get(url);
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept-Charset': 'utf-8', // Without this header, all names containing å, ä or ö are disfigured
+      },
+    );
 
     if (response.statusCode == 200) {
-      final jsonData = response.body;
+      final jsonData = utf8.decode(response.bodyBytes); 
       final dynamicData = jsonDecode(jsonData) as List<dynamic>;
       List<Station> stations = [];
 
@@ -54,7 +59,6 @@ Future<List<Station>> getAllBikeStations() async {
             stad: data['stad'] as String,
           );
           stations.add(station);
-          
         }
       }
       return stations;
@@ -69,3 +73,4 @@ Future<List<Station>> getAllBikeStations() async {
   }
   return [];
 }
+
