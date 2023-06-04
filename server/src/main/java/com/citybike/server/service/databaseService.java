@@ -1,7 +1,9 @@
 package com.citybike.server.service;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,7 +14,7 @@ public class databaseService {
         String jdbcurl = "jdbc:mysql://localhost:3306/citybike";
         String username = "root";
         String password = "";
-        String filepath = "server\\src\\main\\resources\\datasets\\Helsingin_ja_Espoon_kaupunkipyöräasemat_avoin.csv";
+        String filepath = "src\\main\\resources\\datasets\\Helsingin_ja_Espoon_kaupunkipyöräasemat_avoin.csv";
 
         int batchSize = 20;
 
@@ -26,7 +28,7 @@ public class databaseService {
 
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            BufferedReader linReader = new BufferedReader(new FileReader(filepath));
+            BufferedReader linReader = new BufferedReader(new InputStreamReader(new FileInputStream(filepath), StandardCharsets.UTF_8));
 
             String lineText = null;
             int count = 0;
@@ -103,3 +105,4 @@ public class databaseService {
         }
     }
 }
+

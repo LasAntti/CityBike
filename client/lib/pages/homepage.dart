@@ -16,13 +16,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final Map<String, Marker> _markers = {};
-  GoogleMapController? _mapController;
+  late GoogleMapController _mapController;
   bool _showMarkers = true;
   int _selectedIndex = 0;
   List<Station> _stations = [];
   List<Station> _filteredStations = [];
 
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -32,7 +31,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadStations() async {
     _stations = await locations.getAllBikeStations();
-    _filteredStations = _stations; // Initialize filtered stations with all stations
+    _filteredStations =
+        _stations; // Initialize filtered stations with all stations
     _updateMarkers();
   }
 
@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
           .where((station) =>
               station.name!.toLowerCase().contains(searchText.toLowerCase()))
           .toList();
-      _updateMarkers();
+      _updateMarkers();     
     });
   }
 
@@ -83,6 +83,21 @@ class _HomePageState extends State<HomePage> {
       _selectedIndex = index;
     });
   }
+
+  void _handleShowOnMap(int stationId) {
+    final station = _stations.firstWhere((station) => station.id == stationId);
+    _mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(station.latitude, station.longitude),
+          zoom: 15,
+        ),
+      ),
+    );
+    _mapController.showMarkerInfoWindow(MarkerId(station.nimi));
+    _onItemTapped(0);
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -113,11 +128,10 @@ class _HomePageState extends State<HomePage> {
             ),
             markers: _markers.values.toSet(),
           ),
-          SearchBarWidget(
-            onSearchTextChanged: _onSearchTextChanged
-            ),
+          SearchBarWidget(onSearchTextChanged: _onSearchTextChanged),
           StationListWidget(
             stations: _filteredStations,
+            onStationSelected: _handleShowOnMap,
           ),
         ],
       ),
