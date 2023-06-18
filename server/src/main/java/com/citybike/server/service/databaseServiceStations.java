@@ -8,13 +8,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 
-public class databaseService {
+public class databaseServiceStations {
     public static void main(String[] args) {
 
-        String jdbcurl = "jdbc:mysql://localhost:3306/citybike";
+        String jdbcurl = "jdbc:mysql://localhost:3306/city_bike";
         String username = "root";
         String password = "";
-        String filepath = "src\\main\\resources\\datasets\\Helsingin_ja_Espoon_kaupunkipyöräasemat_avoin.csv";
+        String filepath = "server\\src\\main\\resources\\datasets\\Helsingin_ja_Espoon_kaupunkipyöräasemat_avoin.csv";
 
         int batchSize = 20;
 
@@ -28,7 +28,8 @@ public class databaseService {
 
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            BufferedReader linReader = new BufferedReader(new InputStreamReader(new FileInputStream(filepath), StandardCharsets.UTF_8));
+            BufferedReader linReader = new BufferedReader(
+                    new InputStreamReader(new FileInputStream(filepath), StandardCharsets.UTF_8));
 
             String lineText = null;
             int count = 0;
@@ -49,7 +50,6 @@ public class databaseService {
                 String capacity = data[10];
                 String lon = data[11];
                 String lat = data[12];
-                
 
                 statement.setObject(1, parseIntegerOrNull(fid));
                 statement.setObject(2, parseIntegerOrNull(id));
@@ -77,21 +77,13 @@ public class databaseService {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } 
-        
+        }
+
     }
 
     private static Integer parseIntegerOrNull(String value) {
         try {
             return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-    
-    private static Long parseLongOrNull(String value) {
-        try {
-            return Long.parseLong(value);
         } catch (NumberFormatException e) {
             return null;
         }
@@ -105,4 +97,3 @@ public class databaseService {
         }
     }
 }
-

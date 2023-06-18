@@ -1,7 +1,7 @@
+import 'package:client/widgets/trips_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:client/utility/locations.dart' as locations;
-import 'package:client/widgets/list_widget.dart';
 import 'package:client/widgets/search_widget.dart';
 import '../utility/locations.dart';
 
@@ -17,11 +17,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Map<String, Marker> _markers = {};
   late GoogleMapController _mapController;
-  bool _showMarkers = true;
+  bool _showMarkers = false;
   int _selectedIndex = 0;
   List<Station> _stations = [];
   List<Station> _filteredStations = [];
-
 
   @override
   void initState() {
@@ -32,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadStations() async {
     _stations = await locations.getAllBikeStations();
     _filteredStations =
-        _stations; // Initialize filtered stations with all stations
+        _stations.toList(); // Initialize filtered stations with all stations
     _updateMarkers();
   }
 
@@ -65,7 +64,7 @@ class _HomePageState extends State<HomePage> {
           .where((station) =>
               station.name!.toLowerCase().contains(searchText.toLowerCase()))
           .toList();
-      _updateMarkers();     
+      _updateMarkers();
     });
   }
 
@@ -90,14 +89,13 @@ class _HomePageState extends State<HomePage> {
       CameraUpdate.newCameraPosition(
         CameraPosition(
           target: LatLng(station.latitude, station.longitude),
-          zoom: 15,
+          zoom: 14,
         ),
       ),
     );
     _mapController.showMarkerInfoWindow(MarkerId(station.nimi));
     _onItemTapped(0);
-}
-
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,10 +126,20 @@ class _HomePageState extends State<HomePage> {
             ),
             markers: _markers.values.toSet(),
           ),
-          SearchBarWidget(onSearchTextChanged: _onSearchTextChanged),
-          StationListWidget(
-            stations: _filteredStations,
-            onStationSelected: _handleShowOnMap,
+          const TripWidget(),
+          ListView.builder(
+            itemCount: _filteredStations.length,
+            itemBuilder: (context, index) {
+              final station = _filteredStations[index];
+
+              return ListTile(
+                title: Text(station.nimi),
+                subtitle: Text(station.address),
+                onTap: () {
+                  _handleShowOnMap(station.id);
+                },
+              );
+            },
           ),
         ],
       ),
@@ -144,18 +152,33 @@ class _HomePageState extends State<HomePage> {
             label: 'Map',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search_outlined),
-            label: 'Search',
+            icon: Icon(Icons.travel_explore_outlined),
+            label: 'Trips',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list_outlined),
-            label: 'List',
+            icon: Icon(Icons.list_alt_outlined),
+            label: 'Station List',
           ),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.orangeAccent,
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showSearch(
+            context: context,
+            delegate: SearchBarWidget(
+              onSearchTextChanged: _onSearchTextChanged,
+              stations: _stations,
+              onStationSelected: _handleShowOnMap,
+            ),
+          );
+        },
+        backgroundColor: Colors.orangeAccent,
+        child: const Icon(Icons.search),
       ),
     );
   }

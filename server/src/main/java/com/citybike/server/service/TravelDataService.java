@@ -16,8 +16,8 @@ public class TravelDataService {
     @Autowired
     private TravelDataRepo travelRepo;
 
-    public List<TravelData> getAllTravelData() {
-        PageRequest pageRequest = PageRequest.of(0, 100, Sort.by(Sort.Direction.ASC, "id"));
+    public List<TravelData> getAllTravelData(int page) {
+        PageRequest pageRequest = PageRequest.of(page, 100, Sort.by(Sort.Direction.ASC, "id"));
         return travelRepo.findAll(pageRequest).getContent();
     }
 
