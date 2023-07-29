@@ -1,6 +1,7 @@
 import 'package:client/widgets/trips_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:client/utility/locations.dart' as locations;
 import 'package:client/widgets/search_widget.dart';
 import '../utility/locations.dart';
@@ -21,10 +22,13 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   List<Station> _stations = [];
   List<Station> _filteredStations = [];
+  final Location _location = Location();
+  LatLng _currentLocation =  const LatLng(60.16585152619748, 24.931996948918766);
 
   @override
   void initState() {
     super.initState();
+    _getUserLocation();
     _loadStations();
   }
 
@@ -56,6 +60,35 @@ class _HomePageState extends State<HomePage> {
         _markers[station.nimi] = marker;
       }
     });
+  }
+
+  Future<void> _getUserLocation() async {
+    bool serviceEnabled;
+    PermissionStatus permissionStatus;
+
+    serviceEnabled = await _location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await _location.requestService();
+      if (!serviceEnabled) {
+        return;
+      }
+    }
+
+    permissionStatus = await _location.hasPermission();
+    if (permissionStatus == PermissionStatus.denied) {
+      permissionStatus = await _location.requestPermission();
+      if (permissionStatus != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    LocationData locationData = await _location.getLocation();
+    _currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+
+    CameraPosition cameraPosition =
+        CameraPosition(target: _currentLocation, zoom: 12);
+    _mapController
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
   void _onSearchTextChanged(String searchText) {
@@ -120,11 +153,12 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           GoogleMap(
             onMapCreated: _onMapCreated,
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(60.16585152619748, 24.931996948918766),
+            initialCameraPosition: CameraPosition(
+              target: _currentLocation,
               zoom: 12,
             ),
             markers: _markers.values.toSet(),
+            myLocationEnabled: true,
           ),
           const TripWidget(),
           ListView.builder(
