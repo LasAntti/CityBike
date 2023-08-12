@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   List<Station> _stations = [];
   List<Station> _filteredStations = [];
   final Location _location = Location();
-  LatLng _currentLocation =  const LatLng(60.16585152619748, 24.931996948918766);
+  LatLng _currentLocation = const LatLng(60.16585152619748, 24.931996948918766);
 
   @override
   void initState() {
@@ -130,6 +130,14 @@ class _HomePageState extends State<HomePage> {
     _onItemTapped(0);
   }
 
+  bool _handleShowTrips(int index) {
+    if (index == 1 || index == 3) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,7 +163,7 @@ class _HomePageState extends State<HomePage> {
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(
               target: _currentLocation,
-              zoom: 12,
+              zoom: 14,
             ),
             markers: _markers.values.toSet(),
             myLocationEnabled: true,
@@ -200,20 +208,22 @@ class _HomePageState extends State<HomePage> {
         onTap: _onItemTapped,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showSearch(
-            context: context,
-            delegate: SearchBarWidget(
-              onSearchTextChanged: _onSearchTextChanged,
-              stations: _stations,
-              onStationSelected: _handleShowOnMap,
+      floatingActionButton: _handleShowTrips(_selectedIndex)
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: SearchBarWidget(
+                    onSearchTextChanged: _onSearchTextChanged,
+                    stations: _stations,
+                    onStationSelected: _handleShowOnMap,
+                  ),
+                );
+              },
+              backgroundColor: Colors.orangeAccent,
+              child: const Icon(Icons.search),
             ),
-          );
-        },
-        backgroundColor: Colors.orangeAccent,
-        child: const Icon(Icons.search),
-      ),
     );
   }
 }

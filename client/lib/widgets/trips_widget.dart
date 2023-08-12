@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:client/utility/trips.dart' as trips;
+import 'package:client/widgets/filter_trips_widget.dart';
 
 class TripWidget extends StatefulWidget {
   const TripWidget({Key? key}) : super(key: key);
@@ -23,14 +24,62 @@ class _TripWidgetState extends State<TripWidget> {
     _scrollController.addListener(_scrollListener);
   }
 
-  Future<void> _loadTrips() async {
+  /*void _handleFilter(
+      {
+      // ... other filter parameters ...
+      int? departureStationId,
+      int? arrivalStationId,
+      DateTime? minDeparture,
+      DateTime? maxDeparture,
+      DateTime? minArrival,
+      DateTime? maxArrival,
+      int? minDistance,
+      int? maxDistance,
+      int? minDuration,
+      int? maxDuration}) {
+    setState(() {
+      _trips.clear(); // Clear existing trips before applying filters
+    });
+
+    _loadTrips(
+      departureStationId: departureStationId,
+      arrivalStationId: arrivalStationId,
+      // ... other filter parameters ...
+    );
+  }*/
+
+  Future<void> _loadTrips(
+      {int? departureStationId,
+      int? arrivalStationId,
+      DateTime? minDeparture,
+      DateTime? maxDeparture,
+      DateTime? minArrival,
+      DateTime? maxArrival,
+      int? minDistance,
+      int? maxDistance,
+      int? minDuration,
+      int? maxDuration}) async {
     if (_isLoading) return;
 
     setState(() {
       _isLoading = true;
     });
 
-    final newTrips = await trips.getTravelData(_pageNumber);
+    final newTrips = await trips.getFilteredTravelData(
+      pageNumber:
+          _pageNumber, //Needed for pagination, by default returns page 1, scrolling will automatically load more pages
+      departureStationId:
+          departureStationId, //Optional parameters for filtering
+      arrivalStationId: arrivalStationId,
+      minDeparture: minDeparture,
+      maxDeparture: maxDeparture,
+      minArrival: minArrival,
+      maxArrival: maxArrival,
+      minDistance: minDistance,
+      maxDistance: maxDistance,
+      minDuration: minDuration,
+      maxDuration: maxDuration,
+    );
 
     setState(() {
       _trips.addAll(newTrips);
@@ -79,6 +128,45 @@ class _TripWidgetState extends State<TripWidget> {
                   ],
                 ),
               ),
+              FloatingActionButton.extended(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return TripFilterWidget(
+                        onFilter: ({
+                          DateTime? minDeparture,
+                          DateTime? maxDeparture,
+                          DateTime? minArrival,
+                          DateTime? maxArrival,
+                          int? departureStationId,
+                          int? arrivalStationId,
+                          int? minDistance,
+                          int? maxDistance,
+                          int? minDuration,
+                          int? maxDuration,
+                        }) {
+                          _loadTrips(
+                            departureStationId: departureStationId,
+                            arrivalStationId: arrivalStationId,
+                            minDeparture: minDeparture,
+                            maxDeparture: maxDeparture,
+                            minArrival: minArrival,
+                            maxArrival: maxArrival,
+                            minDistance: minDistance,
+                            minDuration: minDuration,
+                            maxDistance: maxDistance,
+                            maxDuration: maxDuration,
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+                backgroundColor: Colors.orangeAccent,
+                label: const Text('Filter trips'),
+                icon: const Icon(Icons.travel_explore_outlined),
+              )
             ],
           );
         } else if (_isLoading) {
