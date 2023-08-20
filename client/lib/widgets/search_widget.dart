@@ -77,7 +77,7 @@ class SearchBarWidget extends SearchDelegate<Station> {
                       _handleShowOnMap(suggestion.id);
                       close(context, suggestion);
                     },
-                    child: const Text("Show on map"),
+                    child: const Text("Select station"),
                   ),
                 ],
               ),

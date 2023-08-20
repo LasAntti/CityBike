@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'pages/homepage.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_config/flutter_config.dart';
 
 void main() async {
-  await dotenv.load(fileName: ".env");
+  WidgetsFlutterBinding.ensureInitialized(); 
+  await FlutterConfig.loadEnvVariables();
   runApp(const MyApp());
 }
 
@@ -17,17 +18,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        //onGenerateRoute: route.controller,
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData.dark(),
-        //darkTheme: ThemeData.dark(),
-        //themeMode: currentTheme.currentTheme(),
-        //initialRoute: 
-        home: const HomePage(),
-      );
+      //onGenerateRoute: route.controller,
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark(),
+      //darkTheme: ThemeData.dark(),
+      //themeMode: currentTheme.currentTheme(),
+      //initialRoute:
+      home: const HomePage(),
+    );
   }
 }
