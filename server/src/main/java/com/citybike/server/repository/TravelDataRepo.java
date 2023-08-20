@@ -22,14 +22,14 @@ public interface TravelDataRepo extends JpaRepository<TravelData, Long> {
                         "(:minDistance IS NULL OR t.distanceCoveredinMeters >= :minDistance) AND " +
                         "(:minDuration IS NULL OR t.durationInSeconds >= :minDuration)")
         Page<TravelData> searchTrips(
-                        @Param("minDeparture") LocalDateTime minDeparture,
-                        @Param("maxDeparture") LocalDateTime maxDeparture,
-                        @Param("minArrival") LocalDateTime minArrival,
-                        @Param("maxArrival") LocalDateTime maxArrival,
+                        @Param("minDeparture") String minDepartureStr,
+                        @Param("maxDeparture") String maxDepartureStr,
+                        @Param("minArrival") String minArrivalStr,
+                        @Param("maxArrival") String maxArrivalStr,
                         @Param("departureStationId") Integer departureStationId,
                         @Param("arrivalStationId") Integer arrivalStationId,
-                        @Param("minDistance") Integer minDistance,
-                        @Param("minDuration") Integer minDuration,
+                        @Param("minDistance") Long minDistance,
+                        @Param("minDuration") Long minDuration,
                         PageRequest pageRequest);
 
 }

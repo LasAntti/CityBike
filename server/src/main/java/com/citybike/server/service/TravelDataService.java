@@ -25,22 +25,22 @@ public class TravelDataService {
     }
 
     public Page<TravelData> searchTrips(
-            LocalDateTime minDeparture,
-            LocalDateTime maxDeparture,
-            LocalDateTime minArrival,
-            LocalDateTime maxArrival,
+            String minDepartureStr,
+            String maxDepartureStr,
+            String minArrivalStr,
+            String maxArrivalStr,
             Integer departureStationId,
             Integer arrivalStationId,
-            Integer minDistance,
-            Integer minDuration,
+            Long minDistance,
+            Long minDuration,
             int page,
             int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         return travelRepo.searchTrips(
-                minDeparture,
-                maxDeparture,
-                minArrival,
-                maxArrival,
+                minDepartureStr,
+                maxDepartureStr,
+                minArrivalStr,
+                maxArrivalStr,
                 departureStationId,
                 arrivalStationId,
                 minDistance,

@@ -211,6 +211,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: _handleShowTrips(_selectedIndex)
           ? null
           : FloatingActionButton(
+            heroTag: 'search_fab_home',
               onPressed: () {
                 showSearch(
                   context: context,

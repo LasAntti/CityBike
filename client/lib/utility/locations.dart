@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_config/flutter_config.dart';
 
 class Station {
   int id;
@@ -30,8 +30,10 @@ class Station {
 }
 
 Future<List<Station>> getAllBikeStations() async {
+  var ipAddress = FlutterConfig.get('IP_ADDRESS');
+  
   try {
-    final url = Uri.parse('http://${dotenv.env['IP_ADDRESS']}:8080/allStationData');
+    final url = Uri.parse('http://$ipAddress:8080/allStationData');
 
     final response = await http.get(
       url,

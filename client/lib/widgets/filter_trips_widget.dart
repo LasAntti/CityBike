@@ -64,9 +64,51 @@ class _TripFilterWidgetState extends State<TripFilterWidget> {
     _stations = await locations.getAllBikeStations();
   }
 
-  // Implement the UI for user input controls (date pickers, sliders, etc.)
-  // and update the state variables (_minDeparture, _maxDeparture, etc.)
-  // based on user interactions.
+  Future<void> _selectDateAndTime(bool isDeparture) async {
+    final BuildContext context = this.context;
+
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2021, 5, 1),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (selectedDate != null) {
+      final selectedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+        builder: (BuildContext context, Widget? child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          );
+        },
+      );
+
+      if (selectedTime != null) {
+        setState(() {
+          if (isDeparture) {
+            _selectedDepartureDate = DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+              selectedTime.hour,
+              selectedTime.minute,
+            );
+          } else {
+            _selectedArrivalDate = DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+              selectedTime.hour,
+              selectedTime.minute,
+            );
+          }
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,20 +127,10 @@ class _TripFilterWidgetState extends State<TripFilterWidget> {
               title: const Text('Departure Date',
                   style: TextStyle(color: Colors.orangeAccent)),
               trailing: _selectedDepartureDate != null
-                  ? Text(_selectedDepartureDate.toString())
-                  : const Text('Select Date'),
-              onTap: () async {
-                final selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime(2021, 5, 1),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101),
-                );
-                if (selectedDate != null) {
-                  setState(() {
-                    _selectedDepartureDate = selectedDate;
-                  });
-                }
+                  ? Text(_selectedDepartureDate.toString().substring(0, 16))
+                  : const Text('Select Date and Time'),
+              onTap: () {
+                _selectDateAndTime(true);
               },
             ),
 
@@ -107,23 +139,13 @@ class _TripFilterWidgetState extends State<TripFilterWidget> {
               title: const Text('Arrival Date',
                   style: TextStyle(color: Colors.orangeAccent)),
               trailing: _selectedArrivalDate != null
-                  ? Text(_selectedArrivalDate.toString())
-                  : const Text('Select Date'),
-              onTap: () async {
-                final selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime(2021, 8, 31),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101),
-                );
-                if (selectedDate != null) {
-                  setState(() {
-                    _selectedArrivalDate = selectedDate;
-                  });
-                }
+                  ? Text(_selectedArrivalDate.toString().substring(0, 16))
+                  : const Text('Select Date and Time'),
+              onTap: () {
+                _selectDateAndTime(false);
               },
             ),
-            
+
             ElevatedButton(
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.orangeAccent),
@@ -169,9 +191,35 @@ class _TripFilterWidgetState extends State<TripFilterWidget> {
               },
               child: Text(
                 _selectedArrivalStationId != null
-                    ? 'Selected Departure Station: ${stationIdToName[_selectedArrivalStationId]}'
-                    : 'Select Departure Station',
+                    ? 'Selected Arrival Station: ${stationIdToName[_selectedArrivalStationId]}'
+                    : 'Select Arrival Station',
               ),
+            ),
+
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: 'Minimum Distance (km)',
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                setState(() {
+                  _minDistance = (int.tryParse(value));
+                  _minDistance = _minDistance! * 1000;
+                });
+              },
+            ),
+
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: 'Minimum Duration (minutes)',
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                setState(() {
+                  _minDuration = (int.tryParse(value));
+                  _minDuration = _minDuration! * 60;
+                });
+              },
             ),
 
             const SizedBox(height: 50),
@@ -183,16 +231,16 @@ class _TripFilterWidgetState extends State<TripFilterWidget> {
               onPressed: () {
                 //Apply selected filters using the widget.onFilter callback
                 widget.onFilter(
-                  minDeparture: _minDeparture,
-                  maxDeparture: _maxDeparture,
-                  minArrival: _minArrival,
-                  maxArrival: _maxArrival,
-                  departureStationId: _departureStationId,
-                  arrivalStationId: _arrivalStationId,
+                  minDeparture: _selectedDepartureDate,
+                  maxDeparture: null,
+                  minArrival: _selectedArrivalDate,
+                  maxArrival: null,
+                  departureStationId: _selectedDepartureStationId,
+                  arrivalStationId: _selectedArrivalStationId,
                   minDistance: _minDistance,
                   minDuration: _minDuration,
                 );
-                Navigator.pop(context); 
+                Navigator.pop(context);
               },
               child: const Text('Apply Filters'),
             ),

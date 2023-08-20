@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,27 +38,35 @@ public class DataController {
 
     @GetMapping("/searchTrips")
     public Page<TravelData> searchTrips(
-            @RequestParam(required = false) LocalDateTime minDeparture,
-            @RequestParam(required = false) LocalDateTime maxDeparture,
-            @RequestParam(required = false) LocalDateTime minArrival,
-            @RequestParam(required = false) LocalDateTime maxArrival,
-            @RequestParam(required = false) Integer departureStationId,
-            @RequestParam(required = false) Integer arrivalStationId,
-            @RequestParam(required = false) Integer minDistance,
-            @RequestParam(required = false) Integer minDuration,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "100") int size) {
-        return travelData.searchTrips(
-                minDeparture,
-                maxDeparture,
-                minArrival,
-                maxArrival,
-                departureStationId,
-                arrivalStationId,
-                minDistance,
-                minDuration,
-                page,
-                size);
-    }
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime minDeparture,
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime maxDeparture,
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime minArrival,
+    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime maxArrival,
+    @RequestParam(required = false) Integer departureStationId,
+    @RequestParam(required = false) Integer arrivalStationId,
+    @RequestParam(required = false) Long minDistance,
+    @RequestParam(required = false) Long minDuration,
+    @RequestParam(defaultValue = "0") Integer page,
+    @RequestParam(defaultValue = "100") Integer size) {
+
+    // Convert LocalDateTime objects to ISO date-time strings
+    String minDepartureStr = (minDeparture != null) ? minDeparture.toString() : null;
+    String maxDepartureStr = (maxDeparture != null) ? maxDeparture.toString() : null;
+    String minArrivalStr = (minArrival != null) ? minArrival.toString() : null;
+    String maxArrivalStr = (maxArrival != null) ? maxArrival.toString() : null;
+
+    return travelData.searchTrips(
+        minDepartureStr,
+        maxDepartureStr,
+        minArrivalStr,
+        maxArrivalStr,
+        departureStationId,
+        arrivalStationId,
+        minDistance,
+        minDuration,
+        page,
+        size);
+}
+
 
 }
