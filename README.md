@@ -9,7 +9,7 @@
 
 ## About The Project
 
-The City Bike Tracker is a web/mobile application developed as a summer project for Oulu University of Applied Sciences during the summer of 2023. I got the project idea from the  Solita Dev Academy pre-assignment of Spring 2023. It provides a user-friendly interface to explore and analyze journey data from city bikes in the Helsinki Capital area. The application allows users to view lists of journeys and stations, and gather insights about bike usage in the region.
+The City Bike Tracker is a web/mobile application developed as a summer project for Oulu University of Applied Sciences during the summer of 2023. I got the project idea from the  [Solita Dev Academy pre-assignment of Spring 2023.](https://github.com/solita/dev-academy-2023-exercise) It provides a user-friendly interface to explore and analyze journey data from city bikes in the Helsinki Capital area. The application allows users to view lists of journeys and stations, and gather insights about bike usage in the region.
 
 ## Built With
 
